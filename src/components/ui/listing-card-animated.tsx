@@ -30,7 +30,6 @@ export const ListingCardAnimated = React.forwardRef<HTMLDivElement, ListingCardA
           )}
           whileHover={{ y: -6 }}
           transition={{ type: "spring", stiffness: 300, damping: 20 }}
-          {...(props as React.HTMLAttributes<HTMLElement>)}
         >
           {/* Featured banner */}
           {listing.is_featured && (
