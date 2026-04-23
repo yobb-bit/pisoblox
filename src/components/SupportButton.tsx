@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { MessageCircle, X, ExternalLink } from "lucide-react";
+import Image from "next/image";
 
 export function SupportButton() {
   const [open, setOpen] = useState(false);
@@ -42,8 +43,8 @@ export function SupportButton() {
             {/* Profile card */}
             <div className="px-6 pb-6">
               <div className="flex items-center gap-4 -mt-6 mb-5">
-                <div className="w-16 h-16 rounded-2xl bg-blue-100 dark:bg-blue-900/40 border-4 border-white dark:border-gray-900 flex items-center justify-center shrink-0 shadow-md">
-                  <span className="text-xl font-black text-blue-500">JK</span>
+                <div className="w-16 h-16 rounded-2xl border-4 border-white dark:border-gray-900 shrink-0 shadow-md overflow-hidden relative">
+                  <Image src="/IMG_0901.JPG" alt="John Kent" fill className="object-cover" />
                 </div>
                 <div className="pt-4">
                   <p className="font-bold text-gray-900 dark:text-white text-sm">John Kent</p>
