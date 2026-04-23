@@ -191,12 +191,12 @@ export default function AdminDashboard() {
           is_featured: true,
           featured_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
         }).eq("id", req.listing_id);
-        if (error) { alert("Error sa pag-feature ng listing: " + error.message); return; }
+        if (error) { alert("Failed to feature listing: " + error.message); return; }
       } else {
         const seller = sellers.find((s) => s.id === req.user_id);
         const currentLimit = seller?.listing_limit ?? 10;
         const { error } = await supabase.from("profiles").update({ listing_limit: currentLimit + 5 }).eq("id", req.user_id);
-        if (error) { alert("Error sa pag-update ng limit: " + error.message); return; }
+        if (error) { alert("Failed to update listing limit: " + error.message); return; }
         setSellers((prev) => prev.map((s) => s.id === req.user_id ? { ...s, listing_limit: s.listing_limit + 5 } : s));
       }
     }
@@ -204,7 +204,7 @@ export default function AdminDashboard() {
   }
 
   async function deleteListing(listing: ListingRow) {
-    if (!confirm(`I-delete ang "${listing.title}"? Hindi na ito mababalik.`)) return;
+    if (!confirm(`Delete "${listing.title}"? This action cannot be undone.`)) return;
     setDeleting(listing.id);
     const supabase = createClient();
 
@@ -254,8 +254,8 @@ export default function AdminDashboard() {
     return (
       <div className="max-w-6xl mx-auto px-4 py-20 text-center">
         <Shield className="w-16 h-16 mx-auto text-gray-300 dark:text-gray-700 mb-4" />
-        <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Walang Access</h1>
-        <p className="text-gray-500 dark:text-gray-400 text-sm">Admin lang ang pwedeng pumasok dito.</p>
+        <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Access Denied</h1>
+        <p className="text-gray-500 dark:text-gray-400 text-sm">You do not have permission to view this page.</p>
       </div>
     );
   }
@@ -270,17 +270,17 @@ export default function AdminDashboard() {
         </div>
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Admin Dashboard</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">I-monitor ang lahat ng sellers at listings</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">monitor all the sellers and listings</p>
         </div>
       </div>
 
       {/* Stats cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[
-          { label: "Kabuuang Sellers", value: stats?.totalSellers ?? 0, icon: <Users className="w-5 h-5" />, color: "text-blue-500 bg-blue-50 dark:bg-blue-900/20" },
-          { label: "Aktibong Listings", value: stats?.totalActive ?? 0, icon: <Package className="w-5 h-5" />, color: "text-green-500 bg-green-50 dark:bg-green-900/20" },
-          { label: "Nabenta Na", value: stats?.totalSold ?? 0, icon: <ShoppingBag className="w-5 h-5" />, color: "text-purple-500 bg-purple-50 dark:bg-purple-900/20" },
-          { label: "Kabuuang Listings", value: stats?.totalListings ?? 0, icon: <TrendingUp className="w-5 h-5" />, color: "text-amber-500 bg-amber-50 dark:bg-amber-900/20" },
+          { label: "ALL SELLERS", value: stats?.totalSellers ?? 0, icon: <Users className="w-5 h-5" />, color: "text-blue-500 bg-blue-50 dark:bg-blue-900/20" },
+          { label: "ACTIVE PRODUCTS LIST", value: stats?.totalActive ?? 0, icon: <Package className="w-5 h-5" />, color: "text-green-500 bg-green-50 dark:bg-green-900/20" },
+          { label: "SOLD", value: stats?.totalSold ?? 0, icon: <ShoppingBag className="w-5 h-5" />, color: "text-purple-500 bg-purple-50 dark:bg-purple-900/20" },
+          { label: "OVERALL PRODUCTS LISTED", value: stats?.totalListings ?? 0, icon: <TrendingUp className="w-5 h-5" />, color: "text-amber-500 bg-amber-50 dark:bg-amber-900/20" },
         ].map((stat) => (
           <div key={stat.label} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4">
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${stat.color}`}>
@@ -296,12 +296,12 @@ export default function AdminDashboard() {
       <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden mb-6">
         <div className="p-5 border-b border-gray-200 dark:border-gray-800 flex items-center gap-2">
           <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-          <h2 className="font-semibold text-gray-900 dark:text-white">I-feature ang mga Listing</h2>
-          <span className="text-xs text-gray-400 ml-1">(pinakabagong 20 listings)</span>
+          <h2 className="font-semibold text-gray-900 dark:text-white">Featured Listings</h2>
+          <span className="text-xs text-gray-400 ml-1">(latest 20 listings)</span>
         </div>
         <div className="divide-y divide-gray-100 dark:divide-gray-800">
           {featuredListings.length === 0 ? (
-            <p className="text-center py-6 text-sm text-gray-400">Walang listings</p>
+            <p className="text-center py-6 text-sm text-gray-400">No listings found</p>
           ) : featuredListings.map((l) => (
             <div key={l.id} className="flex items-center justify-between px-5 py-3">
               <div>
@@ -317,7 +317,7 @@ export default function AdminDashboard() {
                 }`}
               >
                 <Star className={`w-3.5 h-3.5 ${l.is_featured ? "fill-yellow-500 text-yellow-500" : ""}`} />
-                {l.is_featured ? "I-remove ang Feature" : "I-feature"}
+                {l.is_featured ? "Remove Feature" : "Set as Featured"}
               </button>
             </div>
           ))}
@@ -337,7 +337,7 @@ export default function AdminDashboard() {
         </div>
         <div className="divide-y divide-gray-100 dark:divide-gray-800">
           {paymentRequests.length === 0 ? (
-            <p className="text-center py-6 text-sm text-gray-400">Walang payment requests</p>
+            <p className="text-center py-6 text-sm text-gray-400">No payment requests yet</p>
           ) : paymentRequests.map((req) => (
             <div key={req.id} className="flex items-center justify-between px-5 py-3 gap-4">
               <div className="flex-1 min-w-0">
@@ -364,8 +364,8 @@ export default function AdminDashboard() {
                   {req.gcash_ref
                     ? <>Ref: <span className="font-mono font-semibold text-gray-600 dark:text-gray-300">{req.gcash_ref}</span></>
                     : req.receipt_url
-                      ? <a href={req.receipt_url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline font-medium">Tingnan ang screenshot →</a>
-                      : <span className="italic text-gray-300">Walang patunay</span>
+                      ? <a href={req.receipt_url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline font-medium">View receipt →</a>
+                      : <span className="italic text-gray-300">No proof attached</span>
                   }
                   <span className="ml-2">{new Date(req.created_at).toLocaleDateString("fil-PH", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
                 </p>
@@ -407,14 +407,14 @@ export default function AdminDashboard() {
               type="text"
               value={listingSearch}
               onChange={(e) => setListingSearch(e.target.value)}
-              placeholder="Maghanap ng listing..."
+              placeholder="Search listings..."
               className="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
             />
           </div>
         </div>
         <div className="divide-y divide-gray-100 dark:divide-gray-800 max-h-96 overflow-y-auto">
           {filteredListings.length === 0 ? (
-            <p className="text-center py-6 text-sm text-gray-400">Walang listings</p>
+            <p className="text-center py-6 text-sm text-gray-400">No listings found</p>
           ) : filteredListings.map((l) => (
             <div key={l.id} className="flex items-center justify-between px-5 py-3 gap-4">
               <div className="flex-1 min-w-0">
@@ -422,7 +422,7 @@ export default function AdminDashboard() {
                   <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{l.title}</p>
                   <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium shrink-0">{l.category}</span>
                   {l.is_featured && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 font-medium shrink-0">⭐ Featured</span>}
-                  {l.is_sold && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 font-medium shrink-0">Nabenta</span>}
+                  {l.is_sold && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 font-medium shrink-0">Sold</span>}
                 </div>
                 <p className="text-xs text-gray-400 mt-0.5">{l.seller_username} · ₱{l.price.toLocaleString()} · {new Date(l.created_at).toLocaleDateString("fil-PH", { month: "short", day: "numeric", year: "numeric" })}</p>
               </div>
@@ -432,7 +432,7 @@ export default function AdminDashboard() {
                 className="shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-500 text-xs font-medium hover:bg-red-100 dark:hover:bg-red-900/40 disabled:opacity-40 transition-colors"
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                {deleting === l.id ? "Dine-delete..." : "I-delete"}
+                {deleting === l.id ? "Deleting..." : "Delete"}
               </button>
             </div>
           ))}
@@ -442,14 +442,14 @@ export default function AdminDashboard() {
       {/* Sellers table */}
       <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden">
         <div className="p-5 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between gap-4">
-          <h2 className="font-semibold text-gray-900 dark:text-white">Lahat ng Sellers</h2>
+          <h2 className="font-semibold text-gray-900 dark:text-white">All Sellers</h2>
           <div className="relative flex-1 max-w-xs">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Maghanap ng seller..."
+              placeholder="Search sellers..."
               className="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
             />
           </div>
@@ -460,20 +460,20 @@ export default function AdminDashboard() {
             <thead>
               <tr className="border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
                 <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Seller</th>
-                <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Aktibo</th>
-                <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Nabenta</th>
-                <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Kabuuan</th>
+                <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Active</th>
+                <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Sold</th>
+                <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Total</th>
                 <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Limit</th>
-                <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Ayusin ang Limit</th>
+                <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Adjust Limit</th>
                 <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Verified</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Sumali</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Joined</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
               {filteredSellers.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="text-center py-10 text-gray-400 dark:text-gray-600">
-                    Walang sellers na nahanap
+                    No sellers found
                   </td>
                 </tr>
               ) : (
@@ -511,7 +511,7 @@ export default function AdminDashboard() {
                           onClick={() => adjustLimit(seller.id, seller.listing_limit, -5)}
                           disabled={updating === seller.id || seller.listing_limit <= 10}
                           className="p-1.5 rounded-lg bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 text-red-500 disabled:opacity-30 transition-colors"
-                          title="Bawasan ng 5"
+                          title="Decrease by 5"
                         >
                           <Minus className="w-3.5 h-3.5" />
                         </button>
@@ -522,7 +522,7 @@ export default function AdminDashboard() {
                           onClick={() => adjustLimit(seller.id, seller.listing_limit, 5)}
                           disabled={updating === seller.id}
                           className="p-1.5 rounded-lg bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/40 text-green-500 disabled:opacity-30 transition-colors"
-                          title="Dagdagan ng 5"
+                          title="Increase by 5"
                         >
                           <Plus className="w-3.5 h-3.5" />
                         </button>
@@ -537,10 +537,10 @@ export default function AdminDashboard() {
                             ? "bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 hover:bg-blue-200"
                             : "bg-gray-100 dark:bg-gray-800 text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700"
                         }`}
-                        title={seller.is_verified ? "I-remove ang verified" : "I-verify ang seller"}
+                        title={seller.is_verified ? "Remove verified status" : "Verify this seller"}
                       >
                         <BadgeCheck className="w-3.5 h-3.5" />
-                        {seller.is_verified ? "Verified" : "Hindi pa"}
+                        {seller.is_verified ? "Verified" : "Unverified"}
                       </button>
                     </td>
                     <td className="px-4 py-3 text-xs text-gray-400 dark:text-gray-500">
