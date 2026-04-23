@@ -60,7 +60,7 @@ export function SupportButton() {
               </div>
 
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-5 leading-relaxed">
-                Huwag mag-atubiling mag-message! Tutulungan kita sa anumang tanong o isyu tungkol sa PisoBlox.
+                Wag mahiyang mag message if merong kang tanong, problema, o suggestion. i gotchu dawg
               </p>
 
               {/* Facebook - main CTA */}
