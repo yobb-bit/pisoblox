@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import {
   Users, Package, ShoppingBag, TrendingUp,
   Plus, Minus, Search, Shield, BadgeCheck, Star,
-  CheckCircle, XCircle, Clock
+  CheckCircle, XCircle, Clock, Trash2
 } from "lucide-react";
 
 type SellerRow = {
@@ -18,6 +18,18 @@ type SellerRow = {
   active_listings: number;
   sold_listings: number;
   total_listings: number;
+};
+
+type ListingRow = {
+  id: string;
+  title: string;
+  seller_username: string;
+  category: string;
+  price: number;
+  image_url: string | null;
+  is_sold: boolean;
+  is_featured: boolean;
+  created_at: string;
 };
 
 type PaymentRequest = {
@@ -42,12 +54,15 @@ type Stats = {
 export default function AdminDashboard() {
   const [sellers, setSellers] = useState<SellerRow[]>([]);
   const [featuredListings, setFeaturedListings] = useState<{ id: string; title: string; seller_username: string; is_featured: boolean }[]>([]);
+  const [allListings, setAllListings] = useState<ListingRow[]>([]);
   const [paymentRequests, setPaymentRequests] = useState<PaymentRequest[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [unauthorized, setUnauthorized] = useState(false);
   const [search, setSearch] = useState("");
+  const [listingSearch, setListingSearch] = useState("");
   const [updating, setUpdating] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -79,13 +94,28 @@ export default function AdminDashboard() {
       // Fetch all listings
       const { data: allListings } = await supabase
         .from("listings")
-        .select("id, user_id, is_sold, title, seller_username, is_featured");
+        .select("id, user_id, is_sold, title, seller_username, is_featured, category, price, image_url, created_at")
+        .order("created_at", { ascending: false });
 
       setFeaturedListings(
         (allListings ?? [])
           .filter((l) => !l.is_sold)
           .map((l) => ({ id: l.id, title: l.title, seller_username: l.seller_username, is_featured: l.is_featured }))
           .slice(0, 20)
+      );
+
+      setAllListings(
+        (allListings ?? []).map((l) => ({
+          id: l.id,
+          title: l.title,
+          seller_username: l.seller_username,
+          category: l.category,
+          price: l.price,
+          image_url: l.image_url,
+          is_sold: l.is_sold,
+          is_featured: l.is_featured,
+          created_at: l.created_at,
+        }))
       );
 
       if (!profiles || !allListings) { setLoading(false); return; }
@@ -173,8 +203,35 @@ export default function AdminDashboard() {
     setPaymentRequests((prev) => prev.map((p) => p.id === req.id ? { ...p, status: action } : p));
   }
 
+  async function deleteListing(listing: ListingRow) {
+    if (!confirm(`I-delete ang "${listing.title}"? Hindi na ito mababalik.`)) return;
+    setDeleting(listing.id);
+    const supabase = createClient();
+
+    // Delete image from storage if exists
+    if (listing.image_url) {
+      const path = listing.image_url.split("/storage/v1/object/public/")[1];
+      if (path) {
+        const bucket = path.split("/")[0];
+        const filePath = path.split("/").slice(1).join("/");
+        await supabase.storage.from(bucket).remove([filePath]);
+      }
+    }
+
+    await supabase.from("listings").delete().eq("id", listing.id);
+    setAllListings((prev) => prev.filter((l) => l.id !== listing.id));
+    setFeaturedListings((prev) => prev.filter((l) => l.id !== listing.id));
+    setStats((prev) => prev ? { ...prev, totalListings: prev.totalListings - 1, totalActive: listing.is_sold ? prev.totalActive : prev.totalActive - 1, totalSold: listing.is_sold ? prev.totalSold - 1 : prev.totalSold } : prev);
+    setDeleting(null);
+  }
+
   const filteredSellers = sellers.filter((s) =>
     s.username.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const filteredListings = allListings.filter((l) =>
+    l.title.toLowerCase().includes(listingSearch.toLowerCase()) ||
+    l.seller_username.toLowerCase().includes(listingSearch.toLowerCase())
   );
 
   if (loading) {
@@ -331,6 +388,52 @@ export default function AdminDashboard() {
                   </button>
                 </div>
               )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Manage Listings */}
+      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden mb-6">
+        <div className="p-5 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <Trash2 className="w-4 h-4 text-red-500" />
+            <h2 className="font-semibold text-gray-900 dark:text-white">Manage Listings</h2>
+            <span className="text-xs text-gray-400">({allListings.length} total)</span>
+          </div>
+          <div className="relative flex-1 max-w-xs">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              value={listingSearch}
+              onChange={(e) => setListingSearch(e.target.value)}
+              placeholder="Maghanap ng listing..."
+              className="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+            />
+          </div>
+        </div>
+        <div className="divide-y divide-gray-100 dark:divide-gray-800 max-h-96 overflow-y-auto">
+          {filteredListings.length === 0 ? (
+            <p className="text-center py-6 text-sm text-gray-400">Walang listings</p>
+          ) : filteredListings.map((l) => (
+            <div key={l.id} className="flex items-center justify-between px-5 py-3 gap-4">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{l.title}</p>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium shrink-0">{l.category}</span>
+                  {l.is_featured && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 font-medium shrink-0">⭐ Featured</span>}
+                  {l.is_sold && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 font-medium shrink-0">Nabenta</span>}
+                </div>
+                <p className="text-xs text-gray-400 mt-0.5">{l.seller_username} · ₱{l.price.toLocaleString()} · {new Date(l.created_at).toLocaleDateString("fil-PH", { month: "short", day: "numeric", year: "numeric" })}</p>
+              </div>
+              <button
+                onClick={() => deleteListing(l)}
+                disabled={deleting === l.id}
+                className="shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-500 text-xs font-medium hover:bg-red-100 dark:hover:bg-red-900/40 disabled:opacity-40 transition-colors"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                {deleting === l.id ? "Dine-delete..." : "I-delete"}
+              </button>
             </div>
           ))}
         </div>

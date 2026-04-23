@@ -95,8 +95,8 @@ export default function ListingDetailPage() {
 
   return (
     <>
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <Link href="/listings" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors mb-6">
+      <div className="max-w-4xl mx-auto px-4 pt-24 pb-8">
+        <Link href="/listings" className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-white transition-colors mb-6">
           <ArrowLeft className="w-4 h-4" />
           Bumalik sa mga listings
         </Link>
