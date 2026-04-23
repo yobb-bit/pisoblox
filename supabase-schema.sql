@@ -48,7 +48,11 @@ create table if not exists public.profiles (
   username text not null,
   listing_limit integer default 10 not null,
   is_admin boolean default false not null,
-  created_at timestamp with time zone default timezone('utc', now()) not null
+  created_at timestamp with time zone default timezone('utc', now()) not null,
+  seller_status text default 'unverified' not null check (seller_status in ('unverified', 'pending', 'approved', 'rejected')),
+  phone_number text,
+  facebook_profile text,
+  seller_applied_at timestamp with time zone
 );
 
 alter table public.profiles enable row level security;
@@ -122,4 +126,12 @@ create policy "Owners can delete their listing images"
   on storage.objects for delete
   to authenticated
   using (bucket_id = 'listing-images' and (storage.foldername(name))[1] = auth.uid()::text);
+
+-- ============================================
+-- Seller verification columns (run if upgrading existing DB)
+-- ============================================
+alter table public.profiles add column if not exists seller_status text default 'unverified' not null check (seller_status in ('unverified', 'pending', 'approved', 'rejected'));
+alter table public.profiles add column if not exists phone_number text;
+alter table public.profiles add column if not exists facebook_profile text;
+alter table public.profiles add column if not exists seller_applied_at timestamp with time zone;
 

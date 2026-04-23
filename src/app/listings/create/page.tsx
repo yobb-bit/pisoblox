@@ -8,6 +8,8 @@ import { Upload, Link2, Info } from "lucide-react";
 import Image from "next/image";
 import { UpgradeModal } from "@/components/UpgradeModal";
 import { PaymentModal } from "@/components/PaymentModal";
+import Link from "next/link";
+import { Shield } from "lucide-react";
 
 const categories: { value: Category; label: string; desc: string }[] = [
   { value: "item", label: "Item", desc: "Limiteds, accessories, gear" },
@@ -39,6 +41,7 @@ export default function CreateListingPage() {
   const [listingCount, setListingCount] = useState(0);
   const [listingLimit, setListingLimit] = useState(10);
   const [limitLoading, setLimitLoading] = useState(true);
+  const [sellerStatus, setSellerStatus] = useState<string | null>(null);
   const router = useRouter();
 
   // Check how many listings the user has and what their limit is
@@ -55,13 +58,14 @@ export default function CreateListingPage() {
           .eq("user_id", user.id),
         supabase
           .from("profiles")
-          .select("listing_limit")
+          .select("listing_limit, seller_status")
           .eq("id", user.id)
           .single(),
       ]);
 
       setListingCount(count ?? 0);
       setListingLimit(profile?.listing_limit ?? 10);
+      setSellerStatus(profile?.seller_status ?? "unverified");
       setLimitLoading(false);
     }
     checkLimit();
@@ -172,6 +176,36 @@ export default function CreateListingPage() {
     } else {
       router.push("/listings");
     }
+  }
+
+  if (!limitLoading && sellerStatus !== "approved") {
+    const isPending = sellerStatus === "pending";
+    const isRejected = sellerStatus === "rejected";
+    return (
+      <div className="max-w-lg mx-auto px-4 py-20 text-center">
+        <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-2xl w-fit mx-auto mb-4">
+          <Shield className="w-10 h-10 text-blue-500" />
+        </div>
+        <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+          {isPending ? "Application mo ay nasa review pa" : isRejected ? "Na-reject ang iyong application" : "Kailangan muna mag-apply bilang Seller"}
+        </h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+          {isPending
+            ? "Hintayin lang ang approval ng admin bago makapag-post ng listings."
+            : isRejected
+            ? "Hindi naaprubahan ang iyong account. Maaari kang mag-apply ulit."
+            : "Para makapag-post ng listings, kailangan mo munang ma-verify ng admin ang iyong identity."}
+        </p>
+        {!isPending && (
+          <Link
+            href="/apply"
+            className="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-2.5 rounded-xl transition-colors"
+          >
+            {isRejected ? "Mag-apply Ulit" : "Mag-apply Bilang Seller"}
+          </Link>
+        )}
+      </div>
+    );
   }
 
   return (

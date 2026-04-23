@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import {
   Users, Package, ShoppingBag, TrendingUp,
   Plus, Minus, Search, Shield, BadgeCheck, Star,
-  CheckCircle, XCircle, Clock, Trash2
+  CheckCircle, XCircle, Clock, Trash2, UserCheck, ExternalLink
 } from "lucide-react";
 
 type SellerRow = {
@@ -51,11 +51,21 @@ type Stats = {
   totalActive: number;
 };
 
+type SellerApplication = {
+  id: string;
+  username: string;
+  phone_number: string;
+  facebook_profile: string;
+  seller_status: string;
+  seller_applied_at: string;
+};
+
 export default function AdminDashboard() {
   const [sellers, setSellers] = useState<SellerRow[]>([]);
   const [featuredListings, setFeaturedListings] = useState<{ id: string; title: string; seller_username: string; is_featured: boolean }[]>([]);
   const [allListings, setAllListings] = useState<ListingRow[]>([]);
   const [paymentRequests, setPaymentRequests] = useState<PaymentRequest[]>([]);
+  const [applications, setApplications] = useState<SellerApplication[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [unauthorized, setUnauthorized] = useState(false);
@@ -152,6 +162,14 @@ export default function AdminDashboard() {
         .order("created_at", { ascending: false });
       setPaymentRequests(payments ?? []);
 
+      // Fetch seller applications
+      const { data: apps } = await supabase
+        .from("profiles")
+        .select("id, username, phone_number, facebook_profile, seller_status, seller_applied_at")
+        .in("seller_status", ["pending", "approved", "rejected"])
+        .order("seller_applied_at", { ascending: false });
+      setApplications((apps ?? []) as SellerApplication[]);
+
       setLoading(false);
     }
 
@@ -201,6 +219,12 @@ export default function AdminDashboard() {
       }
     }
     setPaymentRequests((prev) => prev.map((p) => p.id === req.id ? { ...p, status: action } : p));
+  }
+
+  async function handleApplication(appId: string, action: "approved" | "rejected") {
+    const supabase = createClient();
+    await supabase.from("profiles").update({ seller_status: action }).eq("id", appId);
+    setApplications((prev) => prev.map((a) => a.id === appId ? { ...a, seller_status: action } : a));
   }
 
   async function deleteListing(listing: ListingRow) {
@@ -290,6 +314,71 @@ export default function AdminDashboard() {
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{stat.label}</p>
           </div>
         ))}
+      </div>
+
+      {/* Seller Applications */}
+      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden mb-6">
+        <div className="p-5 border-b border-gray-200 dark:border-gray-800 flex items-center gap-2">
+          <UserCheck className="w-4 h-4 text-blue-500" />
+          <h2 className="font-semibold text-gray-900 dark:text-white">Seller Applications</h2>
+          {applications.filter((a) => a.seller_status === "pending").length > 0 && (
+            <span className="ml-1 px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs font-bold">
+              {applications.filter((a) => a.seller_status === "pending").length} pending
+            </span>
+          )}
+        </div>
+        <div className="divide-y divide-gray-100 dark:divide-gray-800">
+          {applications.length === 0 ? (
+            <p className="text-center py-6 text-sm text-gray-400">No applications yet</p>
+          ) : applications.map((app) => (
+            <div key={app.id} className="flex items-center justify-between px-5 py-3 gap-4">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">{app.username}</p>
+                  {app.seller_status === "pending" && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 font-medium">Pending</span>
+                  )}
+                  {app.seller_status === "approved" && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-medium">Approved</span>
+                  )}
+                  {app.seller_status === "rejected" && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 font-medium">Rejected</span>
+                  )}
+                </div>
+                <div className="flex items-center gap-3 mt-0.5 flex-wrap">
+                  <span className="text-xs text-gray-400">📱 {app.phone_number}</span>
+                  {app.facebook_profile && (
+                    <a href={app.facebook_profile} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-500 hover:underline flex items-center gap-0.5">
+                      <ExternalLink className="w-3 h-3" />
+                      View Facebook
+                    </a>
+                  )}
+                  <span className="text-xs text-gray-300 dark:text-gray-600">
+                    {new Date(app.seller_applied_at).toLocaleDateString("en-PH", { month: "short", day: "numeric", year: "numeric" })}
+                  </span>
+                </div>
+              </div>
+              {app.seller_status === "pending" && (
+                <div className="flex gap-2 shrink-0">
+                  <button
+                    onClick={() => handleApplication(app.id, "approved")}
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 text-xs font-medium hover:bg-green-100 dark:hover:bg-green-900/40 transition-colors"
+                  >
+                    <CheckCircle className="w-3.5 h-3.5" />
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => handleApplication(app.id, "rejected")}
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-xs font-medium hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors"
+                  >
+                    <XCircle className="w-3.5 h-3.5" />
+                    Reject
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Featured Listings panel */}
