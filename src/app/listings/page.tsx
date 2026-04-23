@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { ListingCard } from "@/components/ListingCard";
 import { type Listing, type Category } from "@/types";
 import { Search, SlidersHorizontal, ArrowUpDown } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const categories: { value: Category | "all"; label: string }[] = [
   { value: "all", label: "Lahat" },
@@ -85,10 +86,15 @@ export default function ListingsPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      <div className="mb-6">
+      <motion.div
+        className="mb-6"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">I-search ang mga nasa Listahan</h1>
         <p className="text-sm text-gray-500 dark:text-gray-400">Hanapin ang Roblox items at accounts mula sa mga PH sellers</p>
-      </div>
+      </motion.div>
 
       {/* Search + Sort row */}
       <div className="flex gap-3 mb-3">
@@ -129,8 +135,15 @@ export default function ListingsPage() {
       </div>
 
       {/* Expandable filter panel */}
+      <AnimatePresence>
       {showFilters && (
-        <div className="mb-4 p-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl flex flex-col sm:flex-row gap-4">
+        <motion.div
+          className="mb-4 p-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl flex flex-col sm:flex-row gap-4"
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          exit={{ opacity: 0, height: 0 }}
+          transition={{ duration: 0.2 }}
+        >
           {/* Category */}
           <div className="flex-1">
             <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Kategorya</p>
@@ -182,8 +195,9 @@ export default function ListingsPage() {
               )}
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
+      </AnimatePresence>
 
       {loading ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -198,15 +212,24 @@ export default function ListingsPage() {
           <p className="text-sm mt-1">Subukan ang ibang search o kategorya</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        <motion.div
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"
+          initial="hidden"
+          animate="visible"
+          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.05 } } }}
+        >
           {listings.map((listing) => (
-            <ListingCard
+            <motion.div
               key={listing.id}
-              listing={listing}
-              sellerVerified={verifiedSellers.has(listing.user_id)}
-            />
+              variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.25 } } }}
+            >
+              <ListingCard
+                listing={listing}
+                sellerVerified={verifiedSellers.has(listing.user_id)}
+              />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       )}
     </div>
   );

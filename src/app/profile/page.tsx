@@ -8,6 +8,7 @@ import { FeatureModal } from "@/components/FeatureModal";
 import { UserCircle, Package, Plus, Star } from "lucide-react";
 import Link from "next/link";
 import { User } from "@supabase/supabase-js";
+import { motion } from "framer-motion";
 
 export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
@@ -56,7 +57,12 @@ export default function ProfilePage() {
   return (
     <>
     <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 mb-8 flex items-center gap-5">
+      <motion.div
+        className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 mb-8 flex items-center gap-5"
+        initial={{ opacity: 0, y: -16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35 }}
+      >
         <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
           <UserCircle className="w-10 h-10 text-blue-500" />
         </div>
@@ -79,7 +85,7 @@ export default function ProfilePage() {
           <Plus className="w-4 h-4" />
           Bagong Listing
         </Link>
-      </div>
+      </motion.div>
 
       {listings.length === 0 ? (
         <div className="text-center py-16 text-gray-400 dark:text-gray-600">
@@ -99,9 +105,18 @@ export default function ProfilePage() {
           {activeListings.length > 0 && (
             <div className="mb-8">
               <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-4">Aktibong Listings</h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              <motion.div
+                className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"
+                initial="hidden"
+                animate="visible"
+                variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.06 } } }}
+              >
                 {activeListings.map((listing) => (
-                  <div key={listing.id} className="flex flex-col gap-1.5">
+                  <motion.div
+                    key={listing.id}
+                    className="flex flex-col gap-1.5"
+                    variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.25 } } }}
+                  >
                     <ListingCard listing={listing} />
                     {listing.is_featured ? (
                       <div className="flex items-center justify-center gap-1.5 py-1.5 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
@@ -122,9 +137,9 @@ export default function ProfilePage() {
                         </p>
                       </button>
                     )}
-                  </div>
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
             </div>
           )}
           {soldListings.length > 0 && (

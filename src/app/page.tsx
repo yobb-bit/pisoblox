@@ -120,20 +120,41 @@ export default function HomePage() {
         <div className="relative z-10 w-full px-6 py-24 flex flex-col items-center text-center">
 
           {/* Title */}
-          <h1 className="text-5xl sm:text-7xl font-black text-white leading-none mb-2 drop-shadow-xl tracking-tight">
+          <motion.h1
+            className="text-5xl sm:text-7xl font-black text-white leading-none mb-2 drop-shadow-xl tracking-tight"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          >
             ROBLOX
-          </h1>
-          <h1 className="text-5xl sm:text-7xl font-black leading-none mb-5 drop-shadow-xl tracking-tight bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
+          </motion.h1>
+          <motion.h1
+            className="text-5xl sm:text-7xl font-black leading-none mb-5 drop-shadow-xl tracking-tight bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
+          >
             MARKETPLACE
-          </h1>
+          </motion.h1>
 
           {/* Subtitle */}
-          <p className="text-base sm:text-lg text-gray-200 mb-8 leading-relaxed max-w-lg font-medium drop-shadow">
+          <motion.p
+            className="text-base sm:text-lg text-gray-200 mb-8 leading-relaxed max-w-lg font-medium drop-shadow"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+          >
             Bumili at magbenta ng Roblox items, accounts,<br className="hidden sm:block" /> at Robux nang ligtas. Para sa mga Filipino traders.
-          </p>
+          </motion.p>
 
           {/* Search bar */}
-          <form onSubmit={handleSearch} className="flex items-center gap-2 bg-black/40 backdrop-blur-md border border-white/20 rounded-2xl px-5 py-3.5 mb-10 w-full max-w-xl shadow-xl">
+          <motion.form
+            onSubmit={handleSearch}
+            className="flex items-center gap-2 bg-black/40 backdrop-blur-md border border-white/20 rounded-2xl px-5 py-3.5 mb-10 w-full max-w-xl shadow-xl"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+          >
             <Search className="w-5 h-5 text-gray-400 shrink-0" />
             <input
               type="text"
@@ -148,7 +169,7 @@ export default function HomePage() {
             >
               Hanapin
             </button>
-          </form>
+          </motion.form>
 
 
         </div>

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ShoppingBag, Eye, EyeOff } from "lucide-react";
 import { Suspense } from "react";
+import { motion } from "framer-motion";
 
 function LoginForm() {
   const [email, setEmail] = useState("");
@@ -34,16 +35,31 @@ function LoginForm() {
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
+      <motion.div
+        className="w-full max-w-md"
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: "easeOut" }}
+      >
+        <motion.div
+          className="text-center mb-8"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.05 }}
+        >
           <div className="flex justify-center mb-3">
             <ShoppingBag className="w-10 h-10 text-blue-500" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Maligayang pagbabalik</h1>
           <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">Mag-sign in sa iyong RobloxPH Market account</p>
-        </div>
+        </motion.div>
 
-        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
+        <motion.div
+          className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm"
+          initial={{ opacity: 0, scale: 0.97 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+        >
           <form onSubmit={handleLogin} className="flex flex-col gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Email</label>
@@ -99,8 +115,8 @@ function LoginForm() {
               Mag-register dito
             </Link>
           </p>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }
