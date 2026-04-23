@@ -180,7 +180,7 @@ export default function ListingDetailPage() {
             )}
 
             <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 mb-6 flex-1">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Paglalarawan</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Description</p>
               <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">{listing.description}</p>
             </div>
 
@@ -217,12 +217,12 @@ export default function ListingDetailPage() {
                 className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
               >
                 <MessageCircle className="w-5 h-5" />
-                Makipag-ugnayan sa Seller
+                Ichat ang Seller
               </button>
             )}
 
             <p className="text-xs text-gray-400 dark:text-gray-600 text-center mt-3">
-              Laging i-verify ang seller bago magpadala ng bayad
+              Laging gumamit ng middleman sa lahat ng transactions.
             </p>
           </div>
         </div>

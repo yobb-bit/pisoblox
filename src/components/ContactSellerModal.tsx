@@ -33,7 +33,7 @@ export function ContactSellerModal({ sellerUsername, facebookLink, isVerified = 
             <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
           </div>
           <div className="flex-1">
-            <h2 className="font-bold text-gray-900 dark:text-white text-base">Babala sa Kaligtasan</h2>
+            <h2 className="font-bold text-gray-900 dark:text-white text-base">WAIT!</h2>
             <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">Basahin muna bago magpatuloy</p>
           </div>
           <button
@@ -84,7 +84,7 @@ export function ContactSellerModal({ sellerUsername, facebookLink, isVerified = 
 
           {/* Warning text */}
           <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-            Aalis ka na sa <strong>RobloxPH Market</strong> at pupunta sa Facebook. Pagkatapos nun, wala na kaming <strong>kontrol</strong> sa mangyayari.
+            Aalis ka na sa <strong>PisoBlox</strong> at pupunta sa Facebook. Pagkatapos nun, wala na kaming <strong>kontrol</strong> sa mangyayari.
           </p>
 
           {/* Safety tips — hidden for verified sellers */}
@@ -92,8 +92,8 @@ export function ContactSellerModal({ sellerUsername, facebookLink, isVerified = 
             <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-3">Bago ka umalis, laging:</p>
             <ul className="flex flex-col gap-2">
               {[
-                "Huwag magpadala ng bayad bago matanggap ang item",
-                "Palaging kumuha ng screenshot ng inyong usapan",
+                "Siguraduhing trusted and middleman na gagamitin mo",
+                "irecord o iscreenshot ang buong transaction bilang ebidensya sakaling may problema",
                 "Laging may middleman para protektado ang dalawang panig",
               ].map((tip, i) => (
                 <li key={i} className="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-300">
@@ -113,7 +113,7 @@ export function ContactSellerModal({ sellerUsername, facebookLink, isVerified = 
               className="mt-0.5 w-4 h-4 accent-blue-500 cursor-pointer"
             />
             <span className="text-xs text-gray-600 dark:text-gray-400">
-              Naiintindihan ko na aalis ako sa platform at ang RobloxPH Market ay hindi responsable sa mga transaksyong gagawin sa Facebook.
+              Naiintindihan ko na aalis ako sa platform at ang PisoBlox ay hindi responsable sa mga transaksyong gagawin sa Facebook.
             </span>
           </label>
 
@@ -131,7 +131,7 @@ export function ContactSellerModal({ sellerUsername, facebookLink, isVerified = 
               className="flex-1 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors flex items-center justify-center gap-1.5"
             >
               <ExternalLink className="w-4 h-4" />
-              Buksan ang Facebook
+              Makipag-usap sa Seller
             </button>
           </div>
 

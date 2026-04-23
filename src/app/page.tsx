@@ -126,7 +126,7 @@ export default function HomePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
           >
-            ROBLOX
+            PisoBlox
           </motion.h1>
           <motion.h1
             className="text-5xl sm:text-7xl font-black leading-none mb-5 drop-shadow-xl tracking-tight bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent"
@@ -134,7 +134,7 @@ export default function HomePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
           >
-            MARKETPLACE
+            ITEMS, ACCOUNTS, AT ROBUX
           </motion.h1>
 
           {/* Subtitle */}
@@ -144,7 +144,7 @@ export default function HomePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.2 }}
           >
-            Bumili at magbenta ng Roblox items, accounts,<br className="hidden sm:block" /> at Robux nang ligtas. Para sa mga Filipino traders.
+            Bumili at magbenta ng Roblox items, accounts,<br className="hidden sm:block" /> at Robux nang ligtas. Para sa mga Pinoy buyers and sellers.
           </motion.p>
 
           {/* Search bar */}
