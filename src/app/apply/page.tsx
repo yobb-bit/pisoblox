@@ -17,8 +17,13 @@ export default function ApplyPage() {
   useEffect(() => {
     async function fetchStatus() {
       const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.push("/auth/login"); return; }
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        router.push("/auth/login");
+        return;
+      }
 
       const { data: profile } = await supabase
         .from("profiles")
@@ -54,7 +59,9 @@ export default function ApplyPage() {
 
     setSubmitting(true);
     const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) return;
 
     const { error: updateError } = await supabase
@@ -109,7 +116,7 @@ export default function ApplyPage() {
         <Clock className="w-14 h-14 mx-auto text-yellow-500 mb-4" />
         <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Na-submit na ang iyong application!</h1>
         <p className="text-sm text-gray-500 dark:text-gray-400">
-          Isinusuri pa ng admin ang iyong account. Hintayin lang — karaniwang 1-2 araw.
+          Chine-check pa ng admin ang iyong account. Hintayin lang — karaniwang 20 - 30 mins.
         </p>
       </div>
     );
@@ -117,19 +124,43 @@ export default function ApplyPage() {
 
   if (status === "rejected") {
     return (
-      <div className="max-w-lg mx-auto px-4 py-16 text-center">
-        <XCircle className="w-14 h-14 mx-auto text-red-500 mb-4" />
-        <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Na-reject ang iyong application</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-          Hindi naaprubahan ng admin ang iyong account. Maaari kang mag-apply ulit na may tamang impormasyon.
-        </p>
-        <form onSubmit={handleSubmit} className="text-left flex flex-col gap-4">
-          <ApplicationFields
-            phoneNumber={phoneNumber}
-            setPhoneNumber={setPhoneNumber}
-            facebookProfile={facebookProfile}
-            setFacebookProfile={setFacebookProfile}
-          />
+      <div className="max-w-lg mx-auto px-4 py-10">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-6 mb-6">
+          <div className="flex items-start gap-4">
+            <div className="p-2 bg-red-100 dark:bg-red-900/40 rounded-xl shrink-0">
+              <XCircle className="w-6 h-6 text-red-500" />
+            </div>
+            <div>
+              <h1 className="text-base font-bold text-red-700 dark:text-red-400 mb-1">Na-reject ang iyong application</h1>
+              <p className="text-sm text-red-600 dark:text-red-300 leading-relaxed">
+                Mukhang <strong>suspicious o bagong gawa</strong> ang iyong Facebook account. Para ma-aprovahan, kailangan ng Facebook na:
+              </p>
+              <ul className="mt-3 flex flex-col gap-1.5">
+                {[
+                  "Hindi bagong gawa — dapat may ilang buwan o taon na",
+                  "May mga tunay na posts, litrato, o kaibigan",
+                  "Mukhang real person, hindi fake account",
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-2 text-xs text-red-600 dark:text-red-300">
+                    <span className="mt-0.5 w-1.5 h-1.5 rounded-full bg-red-400 shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Kung may tamang Facebook ka na, maaari kang mag-apply ulit:</p>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-5 flex flex-col gap-4">
+            <ApplicationFields
+              phoneNumber={phoneNumber}
+              setPhoneNumber={setPhoneNumber}
+              facebookProfile={facebookProfile}
+              setFacebookProfile={setFacebookProfile}
+            />
+          </div>
           {error && <p className="text-sm text-red-500">{error}</p>}
           <button
             type="submit"
@@ -191,7 +222,10 @@ export default function ApplyPage() {
 }
 
 function ApplicationFields({
-  phoneNumber, setPhoneNumber, facebookProfile, setFacebookProfile,
+  phoneNumber,
+  setPhoneNumber,
+  facebookProfile,
+  setFacebookProfile,
 }: {
   phoneNumber: string;
   setPhoneNumber: (v: string) => void;
