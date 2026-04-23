@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { ListingCard } from "@/components/ListingCard";
 import { type Listing, type Category } from "@/types";
-import { Search, SlidersHorizontal, ArrowUpDown } from "lucide-react";
+import { Search, SlidersHorizontal, ArrowUpDown, Star } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { FeatureModal } from "@/components/FeatureModal";
 
 const categories: { value: Category | "all"; label: string }[] = [
   { value: "all", label: "Lahat" },
@@ -24,6 +25,8 @@ const sortOptions = [
 export default function ListingsPage() {
   const [listings, setListings] = useState<Listing[]>([]);
   const [verifiedSellers, setVerifiedSellers] = useState<Set<string>>(new Set());
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [featureListing, setFeatureListing] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<Category | "all">("all");
@@ -36,6 +39,8 @@ export default function ListingsPage() {
     async function fetchListings() {
       setLoading(true);
       const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      setCurrentUserId(user?.id ?? null);
 
       let query = supabase
         .from("listings")
@@ -85,6 +90,7 @@ export default function ListingsPage() {
   const hasActiveFilters = minPrice || maxPrice || category !== "all";
 
   return (
+    <>
     <div className="max-w-6xl mx-auto px-4 py-8">
       <motion.div
         className="mb-6"
@@ -221,16 +227,47 @@ export default function ListingsPage() {
           {listings.map((listing) => (
             <motion.div
               key={listing.id}
+              className="flex flex-col gap-1.5"
               variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.25 } } }}
             >
               <ListingCard
                 listing={listing}
                 sellerVerified={verifiedSellers.has(listing.user_id)}
               />
+              {currentUserId === listing.user_id && !listing.is_sold && (
+                listing.is_featured ? (
+                  <div className="flex items-center justify-center gap-1.5 py-1.5 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
+                    <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                    <span className="text-xs font-semibold text-yellow-600 dark:text-yellow-400">Featured na!</span>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setFeatureListing(listing)}
+                    className="w-full py-2 px-3 rounded-lg bg-yellow-400/10 hover:bg-yellow-400/20 border border-yellow-300 dark:border-yellow-700 transition-colors text-left"
+                  >
+                    <p className="text-xs font-semibold text-yellow-700 dark:text-yellow-400 flex items-center gap-1">
+                      <Star className="w-3 h-3 fill-yellow-500 text-yellow-500" />
+                      ₱29 para i-feature ito
+                    </p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 leading-tight">
+                      Mas makikita ng mga buyer — ilalagay namin sa unahan
+                    </p>
+                  </button>
+                )
+              )}
             </motion.div>
           ))}
         </motion.div>
       )}
     </div>
+
+      {featureListing && (
+        <FeatureModal
+          listingId={featureListing.id}
+          listingTitle={featureListing.title}
+          onClose={() => setFeatureListing(null)}
+        />
+      )}
+    </>
   );
 }
