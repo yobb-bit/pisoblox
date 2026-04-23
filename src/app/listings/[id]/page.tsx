@@ -203,6 +203,12 @@ export default function ListingDetailPage() {
                 >
                   {markingAsSold ? "Ina-update..." : "Markahan bilang Nabenta"}
                 </button>
+                <Link
+                  href={`/listings/${listing.id}/edit`}
+                  className="w-full py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2 text-sm"
+                >
+                  I-edit ang Listing
+                </Link>
                 <p className="text-xs text-center text-gray-400">Ito ang iyong listing</p>
               </div>
             ) : (
