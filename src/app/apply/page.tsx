@@ -263,6 +263,12 @@ function ApplicationFields({
           className="w-full px-3 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
         />
         <p className="text-xs text-gray-400 mt-1">Ang iyong personal na Facebook account para ma-verify ka ng admin</p>
+        <div className="mt-2 flex items-start gap-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg px-3 py-2">
+          <span className="text-amber-500 text-sm shrink-0">⚠️</span>
+          <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">
+            <strong>Tandaan:</strong> Siguraduhing hindi spam o bagong gawa ang Facebook na ilalagay mo — mare-reject lamang ito at kailangan mong mag-apply ulit.
+          </p>
+        </div>
       </div>
     </>
   );
