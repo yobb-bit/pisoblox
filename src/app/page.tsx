@@ -171,6 +171,26 @@ export default function HomePage() {
             </button>
           </motion.form>
 
+          {/* CTA buttons */}
+          <motion.div
+            className="flex items-center gap-3"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.4 }}
+          >
+            <Link
+              href="/listings"
+              className="px-6 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-semibold transition-colors backdrop-blur-sm"
+            >
+              Mag-browse
+            </Link>
+            <Link
+              href="/listings/create"
+              className="px-6 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold transition-colors shadow-lg shadow-blue-500/30"
+            >
+              Magbenta →
+            </Link>
+          </motion.div>
 
         </div>
       </section>
